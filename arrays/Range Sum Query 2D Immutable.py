@@ -12,40 +12,56 @@ from typing import List
 class NumMatrix:
 
     def __init__(self, matrix: List[List[int]]):
-        vals:List[List[int]] = []
 
-        for row in matrix:
-            sum = 0
-            res:List[int] = []
+        ROWS = len(matrix)
+        COLS = len(matrix[0])
 
-            for val in row:
-                sum += val
-                res.append(sum)
+        # make matrix with same dimensions+1, place 0 in all cells
+        self.values = [ [ 0 for y in range(COLS+1) ] for x in range(ROWS+1) ]
 
-            vals.append(res)
+        # calc 2d prefix sum, by adding left + above values
+        for row in range(ROWS):
+            prefix_sum = 0
+            for col in range(COLS):
+                prefix_sum += matrix[row][col]
+                # there is padding in new matrix but none in original,
+                # hence we increment col but leave row
+                # getting the value directly above
+                above = self.values[row][col+1]
+                # offset by one due to padding
+                self.values[row+1][col+1] = prefix_sum + above
 
-        self.matrix = vals
 
     def sumRegion(self, row1: int, col1: int, row2: int, col2: int) -> int:
-        sum = 0
+        # account padding
+        r1 = row1+1
+        r2 = row2+1
+        c1 = col1+1
+        c2 = col2+1
 
-        for row in self.matrix[row1:row2+1]:
-            left_bound = 0
-            if col1 > 0:
-                left_bound = col1
-            row_sum = row[col2] - row[left_bound-1]
+        # 2D sum form top-left to the query bottom-right
+        bottom_right = self.values[r2][c2]
+        # area above query
+        above = self.values[r1-1][c2]
+        # area left of query
+        left = self.values[r2][c1-1]
+        # area that is contained in both above and left, which needs to be re added
+        top_left = self.values[r1-1][c1-1]
 
-            sum += row_sum
-
-        return sum
+        return bottom_right - above - left + top_left
 
 
 
-
-mat = [[-1 ]]
+mat = [ [3, 0, 1, 4, 2],
+        [5, 6, 3, 2, 1],
+        [1, 2, 0, 1, 5],
+        [4, 1, 0, 1, 7],
+        [1, 0, 3, 0, 5] ]
 
 nm = NumMatrix(mat)
-#print(nm.matrix)
 
 
-print(nm.sumRegion(0, 0, 0, 0)) # 8
+
+
+
+print(nm.sumRegion(2, 1, 4, 3)) # 8
