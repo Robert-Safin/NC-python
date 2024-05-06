@@ -7,30 +7,25 @@
 
 from typing import List
 
-def dfs(nums: List[int], i: int, subset: List[int], res: List[List[int]]):
+def subsets(nums: List[int]) -> List[List[int]]:
+    current_set:List[int] = []
+    subsets:List[List[int]] = []
+
+    generate_subsets(0, nums, current_set, subsets)
+
+    return subsets
+
+def generate_subsets(i:int, nums:List[int], current_set:List[int], subsets:List[List[int]]):
 
     if i >= len(nums):
-        res.append(subset.copy())
+        subsets.append(current_set.copy())
         return
 
-    # Include nums[i] in the subset
-    subset.append(nums[i])
-    dfs(nums, i + 1, subset, res)
+    current_set.append(nums[i])
+    generate_subsets(i+1, nums, current_set, subsets)
 
-    # Do not include nums[i] in the subset
-    subset.pop()
-    dfs(nums, i + 1, subset, res)
-
-
-
-
-def subsets(nums: List[int]) -> List[List[int]]:
-    res:List[List[int]] = []
-    subset:List[int] = []
-
-
-    dfs(nums, 0, subset, res)
-    return res
+    current_set.pop()
+    generate_subsets(i+1, nums, current_set, subsets)
 
 
 nums = [1,2,3]
