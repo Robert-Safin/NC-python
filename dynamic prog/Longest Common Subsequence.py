@@ -9,36 +9,65 @@
 # A common subsequence of two strings is a subsequence that is
 # common to both strings.
 
-from collections import deque
-from typing import Deque,List
 
-def longestCommonSubsequence(text1: str, text2: str) -> int:
-    # Initialize a grid with dimensions (len(text2) + 1) x (len(text1) + 1) for memoization
-    grid = [[0] * (len(text1) + 1) for _ in range(len(text2) + 1)]
-
-    # Start the DFS from the beginning of both texts
-    return dfs(text1, text2, 0, 0, grid)
-
-def dfs(text1: str, text2: str, r: int, c: int, grid: List[List[int]]):
-    # Check if the end of either string has been reached
-    if r == len(text2) or c == len(text1):
-        return 0
-
-    # Use memoized result if already computed
-    if grid[r][c] != 0:
-        return grid[r][c]
-
-    # If the characters match, move diagonally in the grid
-    if text1[c] == text2[r]:
-        grid[r][c] = 1 + dfs(text1, text2, r + 1, c + 1, grid)
-    else:
-        # Otherwise, take the maximum of moving in one string or the other
-        grid[r][c] = max(dfs(text1, text2, r + 1, c, grid), dfs(text1, text2, r, c + 1, grid))
-
-    return grid[r][c]
+from typing import Dict,Tuple
 
 
+# bottom-up
+class Solution:
+    def longestCommonSubsequence(self, text1: str, text2: str) -> int:
+
+        ROWS = len(text1)
+        COLS = len(text2)
+
+        grid = [ [0 for _ in range(COLS+1) ] for _ in range(ROWS+1) ]
+
+        for row in range(ROWS):
+            for col in range(COLS):
+
+                if text1[row] == text2[col]:
+                    grid[row+1][col+1] = 1 + grid[row][col]
+                else:
+                    grid[row+1][col+1] = max(grid[row][col+1], grid[row+1][col])
+
+        return grid[ROWS][COLS]
+
+
+
+
+
+
+# # top-down
+# class Solution:
+#     def longestCommonSubsequence(self, text1: str, text2: str) -> int:
+
+#         return self.dfs(text1, text2, 0,0, {})
+
+#     def dfs(self, text1:str, text2:str, i1:int, i2:int, cache:Dict[Tuple[int,int],int]) -> int:
+
+#         if i1 == len(text1) or i2 == len(text2):
+#             return 0
+
+#         if (i1,i2) in cache:
+#             return cache[(i1,i2)]
+
+#         if text1[i1] == text2[i2]:
+#             return 1 + self.dfs(text1, text2, i1+1, i2+1, cache)
+
+#         cache[(i1,i2)] =  max(
+#             self.dfs(text1, text2, i1+1, i2, cache),
+#             self.dfs(text1, text2, i1, i2+1, cache)
+#         )
+
+#         return cache[(i1,i2)]
+
+
+
+
+
+
+sol = Solution()
 text1 = "abcde"
 text2 = "ace"
 
-print(longestCommonSubsequence(text1,text2))
+print(sol.longestCommonSubsequence(text1,text2)) # 3
